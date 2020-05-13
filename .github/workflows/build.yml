@@ -75,7 +75,7 @@ jobs:
         shell: bash
 
       - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@bb95ce727fd49ec1a65933419cc7c91747785302
+        uses: actions/setup-dotnet@1.4.0
         with:
           dotnet-version: ${{ env.dotnet_sdk_version }}
 
@@ -111,7 +111,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@bb95ce727fd49ec1a65933419cc7c91747785302
+        uses: actions/setup-dotnet@1.4.0
         with:
           dotnet-version: ${{ env.dotnet_sdk_version }}
 
