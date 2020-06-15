@@ -45,7 +45,11 @@ namespace Npgsql
         /// </summary>
         CommandBehavior _behavior;
 
-        //Task _sendTask = default!;
+        /// <summary>
+        /// In multiplexing, this is <see langword="null" /> as the sending is managed in the write multiplexing loop,
+        /// and does not need to be awaited by the reader.
+        /// </summary>
+        Task? _sendTask;
 
         internal ReaderState State;
 
@@ -132,7 +136,8 @@ namespace Npgsql
             Connector = connector;
         }
 
-        internal void Init(NpgsqlCommand command, CommandBehavior behavior, List<NpgsqlStatement> statements /*, Task sendTask */)
+        internal void Init
+            (NpgsqlCommand command, CommandBehavior behavior, List<NpgsqlStatement> statements, Task? sendTask = null)
         {
             Command = command;
             //Debug.Assert(command.Connection != null && command.Connection == Connector.Connection);
@@ -142,7 +147,7 @@ namespace Npgsql
             _isSequential = _behavior.HasFlag(CommandBehavior.SequentialAccess);
             _statements = statements;
             StatementIndex = -1;
-            //_sendTask = sendTask;
+            _sendTask = sendTask;
             State = ReaderState.BetweenResults;
             _recordsAffected = null;
         }
@@ -866,12 +871,22 @@ namespace Npgsql
                 throw new ArgumentOutOfRangeException();
             }
 
-            Cleanup(async, connectionClosing);
+            await Cleanup(async, connectionClosing);
         }
 
-        internal void Cleanup(bool async, bool connectionClosing=false)
+        internal async Task Cleanup(bool async, bool connectionClosing=false)
         {
             Log.Trace("Cleaning up reader", Connector.Id);
+
+            // Make sure the send task for this command, which may have executed asynchronously and in
+            // parallel with the reading, has completed, throwing any exceptions it generated.
+            if (_sendTask != null)
+            {
+                if (async)
+                    await _sendTask;
+                else
+                    _sendTask.GetAwaiter().GetResult();
+            }
 
             State = ReaderState.Closed;
             Command.State = CommandState.Idle;

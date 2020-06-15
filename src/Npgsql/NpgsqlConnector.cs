@@ -1105,7 +1105,7 @@ namespace Npgsql
                     if (CurrentReader != null)
                     {
                         // The reader cleanup will call EndUserAction
-                        CurrentReader.Cleanup(async);
+                        await CurrentReader.Cleanup(async);
                     }
                     else
                     {
