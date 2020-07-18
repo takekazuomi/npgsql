@@ -1,20 +1,23 @@
+Experimental implementation
+===========================
 
-Npgsql - .Net Data Provider for PostgreSQL
+Implemented KeepAlive in Npgsql 2.0.12.
 
+Of ConnectionString, it is enabled by KeepAlive setting.
 
 
 WHAT'S IT?
 ==========
-    
+
     Npgsql is a .Net Data Provider for PostgreSQL. It allows you to connect to PostgreSQL server
 in .Net.
 
 
 HISTORY
 =======
-    
+
     Check RELEASENOTES.txt file for a comprehensive list of details about Npgsql history.
-    
+
 
 COMPILING
 ===========
@@ -28,9 +31,9 @@ run 'nant tests' from src
 
 DEVELOPERS
 ==========
-    
+
     We have the following developers who work or have worked with Npgsql since its beginning, in no particular order:
-    
+
     Brar Piening
     Francisco Figueiredo Jr.
     Ben Clewett
@@ -44,16 +47,16 @@ DEVELOPERS
     Thilo Utke
     Hiroshi Saito
 
-    
+
 CONTACT INFO
 ============
-    
+
     Web:
     All info related to Npgsql can be found in its homepage:
     http://www.npgsql.org
     http://npgsql.projects.postgresql.org
-    
-    
 
-    
+
+
+
 
