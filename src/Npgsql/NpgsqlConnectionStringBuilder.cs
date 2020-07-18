@@ -127,6 +127,8 @@ namespace Npgsql
             defaults.Add(Keywords.Compatible, THIS_VERSION);
             
             defaults.Add(Keywords.ApplicationName, string.Empty);
+
+            defaults.Add(Keywords.KeepAlive, 0);
 		}
 
 
@@ -605,6 +607,15 @@ namespace Npgsql
             set { SetValue(GetKeyName(Keywords.ApplicationName), value); }
         }
 
+        private int _keep_alive;
+
+        public int KeepAlive
+        {
+            get { return _keep_alive; }
+
+            set { SetValue(GetKeyName(Keywords.KeepAlive), value); }
+        }
+
 		#endregion
 
 		private static Keywords GetKey(string key)
@@ -718,7 +729,10 @@ namespace Npgsql
                 case "APPLICATIONNAME":
                     return Keywords.ApplicationName;
 
-				default:
+                case "KEEPALIVE":
+                    return Keywords.KeepAlive;
+
+                default:
 
 					throw new ArgumentException(resman.GetString("Exception_WrongKeyVal"), key);
 			}
@@ -1016,7 +1030,12 @@ namespace Npgsql
                     case Keywords.ApplicationName:
                         this._application_name = Convert.ToString(value);
                         break;
-				}
+
+                    case Keywords.KeepAlive:
+                        this._keep_alive = ToInt32(value, 0, Int32.MaxValue, key_name);
+                        break;
+
+                }
 			}
 
 			catch (InvalidCastException exception)
@@ -1141,7 +1160,8 @@ namespace Npgsql
         IntegratedSecurity,
         Compatible,
 
-        ApplicationName
+        ApplicationName,
+		KeepAlive
 	}
 
 

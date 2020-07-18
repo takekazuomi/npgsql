@@ -260,6 +260,11 @@ namespace Npgsql
             get { return settings.IntegratedSecurity; }
         }
 
+        internal int KeepAlive
+        {
+            get { return settings.KeepAlive; }
+        }
+
         /// <summary>
         /// Gets the current state of the connection.
         /// </summary>

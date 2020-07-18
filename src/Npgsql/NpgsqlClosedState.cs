@@ -171,6 +171,10 @@ namespace Npgsql
 					throw new Exception(string.Format(resman.GetString("Exception_FailedConnection"), context.Host));
 				}
 
+				// KeepAlive support
+                if (context.KeepAlive > 0)
+                    SetKeepAlive(socket, context.KeepAlive, context.KeepAlive);
+
 				//Stream stream = new NetworkStream(socket, true);
                 Stream stream = new NpgsqlNetworkStream(context, socket, true);
 
@@ -237,5 +241,30 @@ namespace Npgsql
 		{
 			//DO NOTHING.
 		}
-	}
+
+		// 
+        private static void SetKeepAlive(Socket socket, int tcpKeepAliveTime, int tcpKeepAliveInterval)
+        {
+			// https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/dd877220(v=vs.85)#remarks
+            // Marshal a byte array containing the params for WsaIoctl
+            // struct tcp_keepalive {
+            //    u_long  onoff;
+            //    u_long  keepalivetime;
+            //    u_long  keepaliveinterval;
+            // };
+            var input = new byte[sizeof(int) * 3];
+            input[0] = 1;
+            input[4] = (byte) (tcpKeepAliveTime & 0xff);
+            input[5] = (byte) ((tcpKeepAliveTime >> 8) & 0xff);
+            input[6] = (byte) ((tcpKeepAliveTime >> 16) & 0xff);
+            input[7] = (byte) ((tcpKeepAliveTime >> 24) & 0xff);
+            input[8] = (byte) (tcpKeepAliveInterval & 0xff);
+            input[9] = (byte) ((tcpKeepAliveInterval >> 8) & 0xff);
+            input[10] = (byte) ((tcpKeepAliveInterval >> 16) & 0xff);
+            input[11] = (byte) ((tcpKeepAliveInterval >> 24) & 0xff);
+
+            // do WSAIoctl call
+            socket.IOControl(IOControlCode.KeepAliveValues, input, null);
+        }
+    }
 }
